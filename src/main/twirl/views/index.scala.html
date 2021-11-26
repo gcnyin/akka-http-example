@@ -1,8 +1,24 @@
+@import example.Model.Fortune
+@(fortunes: Seq[Fortune])
+
+<!DOCTYPE html>
 <html>
     <head>
         <title>Akka http performance test demo</title>
     </head>
     <body>
-        <p>Hello, world!</p>
+        <h1>Hello, akka-http!</h1>
+        <table>
+            <tr>
+                <th>id</th>
+                <th>message</th>
+            </tr>
+            @for(f <- fortunes) {
+                <tr>
+                    <td>@f.id</td>
+                    <td>@f.message</td>
+                </tr>
+            }
+        </table>
     </body>
 </html>

@@ -10,7 +10,8 @@ import com.typesafe.scalalogging.Logger
 import example.Model._
 import io.circe.generic.auto._
 import io.circe.syntax._
-import reactivemongo.api.bson.document
+import reactivemongo.api.Cursor
+import reactivemongo.api.bson.{BSONDocument, document}
 
 import java.util.concurrent.ThreadLocalRandom
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -24,7 +25,7 @@ class Routes(mongoClient: MongoClient)(implicit val system: ActorSystem[_]) {
 
   private val logger: Logger = Logger[Routes]
 
-  val routes: Route = {
+  val routes: Route =
     path("plaintext") {
       complete(HttpEntity(ContentTypes.`application/json`, """{"name": "Tom"}"""))
     } ~ path("json") {
@@ -52,25 +53,62 @@ class Routes(mongoClient: MongoClient)(implicit val system: ActorSystem[_]) {
             complete(HttpEntity(ContentTypes.`application/json`, value.asJson.noSpaces))
         }
       }
+    } ~ path("updates") {
+      parameter("queries".optional) { queries =>
+        onComplete(handleUpdates(queries)) {
+          case Failure(exception) =>
+            logger.error("error", exception)
+            complete(InternalServerError)
+          case Success(value) =>
+            complete(HttpEntity(ContentTypes.`application/json`, value.asJson.noSpaces))
+        }
+      }
+    } ~ path("fortunes") {
+      onComplete(queryFortunes()) {
+        case Failure(exception) =>
+          logger.error("error", exception)
+          complete(InternalServerError)
+        case Success(value) =>
+          complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, views.html.index(value).body))
+      }
     }
-  }
 
-  def handleDb(): Future[Option[World]] = queryOneElement()
+  private def handleDb(): Future[Option[World]] = queryOneElement()
 
-  def handleQueries(queries: Option[String]): Future[Seq[Option[World]]] = {
-    val queriesParam: Int = queries
+  private def handleQueries(queries: Option[String]): Future[IndexedSeq[Option[World]]] =
+    Future.sequence((1 to getQueriesValue(queries)).map(_ => queryOneElement()))
+
+  private def handleUpdates(queries: Option[String]): Future[IndexedSeq[Option[World]]] =
+    Future.sequence((1 to getQueriesValue(queries)).map(_ => findAndUpdateWorld(randomNumber(), randomNumber())))
+
+  private def findAndUpdateWorld(id: Int, randomNumber: Int): Future[Option[World]] =
+    for {
+      coll <- mongoClient.worldCollectionFuture
+      res <- coll.findAndUpdate(
+        document("id" -> id),
+        document("$set" -> document("randomNumber" -> randomNumber)),
+        fetchNewObject = true)
+    } yield res.result[World]
+
+  private def getQueriesValue(queries: Option[String]): Int =
+    queries
       .flatMap(it => Try(it.toInt).toOption)
       .map(_.max(1))
       .map(_.min(500))
       .getOrElse(1)
-    Future.sequence((1 to queriesParam).map(_ => queryOneElement()))
-  }
 
-  def queryOneElement(): Future[Option[World]] =
+  private def queryOneElement(): Future[Option[World]] =
     for {
       coll <- mongoClient.worldCollectionFuture
-      r <- coll.find(document("id" -> randomWorld())).one[World]
+      r <- coll.find(document("id" -> randomNumber())).one[World]
     } yield r
 
-  def randomWorld(): Int = 1 + ThreadLocalRandom.current.nextInt(10000)
+  private def randomNumber(): Int =
+    1 + ThreadLocalRandom.current.nextInt(10000)
+
+  private def queryFortunes(): Future[Seq[Fortune]] =
+    for {
+      coll <- mongoClient.fortuneCollectionFuture
+      re <- coll.find(document()).cursor[Fortune]().collect[Seq]()
+    } yield re
 }
