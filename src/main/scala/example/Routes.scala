@@ -10,13 +10,13 @@ import com.typesafe.scalalogging.Logger
 import example.Model._
 import io.circe.generic.auto._
 import io.circe.syntax._
-import reactivemongo.api.Cursor
-import reactivemongo.api.bson.{BSONDocument, document}
+import reactivemongo.api.bson.document
 
 import java.util.concurrent.ThreadLocalRandom
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.util.{Failure, Success, Try}
 
+@deprecated
 class Routes(mongoClient: MongoClient)(implicit val system: ActorSystem[_]) {
   case class User(name: String)
 

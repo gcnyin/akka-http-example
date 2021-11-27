@@ -3,12 +3,18 @@ ThisBuild / version := "1.0"
 ThisBuild / organization := "com.example"
 ThisBuild / organizationName := "example"
 
+val tapirVersion = "0.19.0"
 val akkaVersion = "2.6.17"
 
 lazy val root = (project in file("."))
   .settings(
-    name := "akka-http-performance-test-demo",
+    name := "akka-http-example",
     libraryDependencies ++= Seq(
+      "com.softwaremill.sttp.tapir" %% "tapir-akka-http-server" % tapirVersion,
+      "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % tapirVersion,
+      "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapirVersion,
+      "com.softwaremill.sttp.tapir" %% "tapir-openapi-docs" % tapirVersion,
+      "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe-yaml" % tapirVersion,
       "com.typesafe.akka" %% "akka-http" % "10.2.7",
       "com.typesafe.akka" %% "akka-stream" % akkaVersion,
       "com.typesafe.akka" %% "akka-actor-typed" % akkaVersion,

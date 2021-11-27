@@ -36,11 +36,10 @@ object Main {
 
     Http()
       .newServerAt("0.0.0.0", port)
-      .bindFlow(httpRoutes.routes)
+      .bindFlow(new Api(mongoClient).route)
       .onComplete {
         case Failure(exception) =>
           logger.error("error", exception)
-          system.terminate()
         case Success(value) =>
           logger.info("{}", value)
       }

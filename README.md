@@ -1,6 +1,13 @@
-# akka-http-performance-test-demo
+# akka-http-example
 
 Inspired by [Techpower benchmarks](https://www.techempower.com/benchmarks).
+
+Powered by Akka, Tapir and MongoDB.
+
+## Requirements
+
+- Java 8+
+- MongoDB
 
 ## Preparation
 
@@ -15,11 +22,15 @@ Run the scripts in the `mongo-migration` directory in the MongoDB console.
 ## Build
 
 ```
-sbt stage
+sbt clean stage
 ```
 
 ## Run
 
 ```
-./target/universal/stage/bin/akka-http-performance-test-demo
+./target/universal/stage/bin/akka-http-example
 ```
+
+## Swagger UI
+
+<http://localhost:8080/docs/index.html?url=/docs/docs.yaml>
