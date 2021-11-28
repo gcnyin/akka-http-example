@@ -36,7 +36,7 @@ object Main {
 
     Http()
       .newServerAt("0.0.0.0", port)
-      .bindFlow(new Api(mongoClient).route)
+      .bindFlow(new Api(new ServiceLogic(mongoClient)).route)
       .onComplete {
         case Failure(exception) =>
           logger.error("error", exception)
