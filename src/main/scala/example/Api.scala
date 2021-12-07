@@ -11,11 +11,14 @@ import sttp.tapir.swagger.bundle.SwaggerInterpreter
 import scala.concurrent.Future
 
 class Api(serviceLogic: ServiceLogic) {
-  private val jsonRoute: Route = AkkaHttpServerInterpreter().toRoute(jsonApi.serverLogic(_ => serviceLogic.jsonLogic()))
+  private val jsonRoute: Route =
+    AkkaHttpServerInterpreter().toRoute(jsonApi.serverLogic(_ => serviceLogic.jsonLogic()))
 
-  private val queriesRoute: Route = AkkaHttpServerInterpreter().toRoute(queriesApi.serverLogic(serviceLogic.queriesLogic))
+  private val queriesRoute: Route =
+    AkkaHttpServerInterpreter().toRoute(queriesApi.serverLogic(serviceLogic.queriesLogic))
 
-  private val updatesRoute: Route = AkkaHttpServerInterpreter().toRoute(updatesApi.serverLogic(serviceLogic.updatesLogic))
+  private val updatesRoute: Route =
+    AkkaHttpServerInterpreter().toRoute(updatesApi.serverLogic(serviceLogic.updatesLogic))
 
   private val apiList: List[AnyEndpoint] = List(jsonApi, queriesApi, updatesApi)
 

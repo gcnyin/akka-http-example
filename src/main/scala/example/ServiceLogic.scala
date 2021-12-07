@@ -28,7 +28,8 @@ class ServiceLogic(mongoClient: MongoClient)(implicit val ec: ExecutionContextEx
   private def updateOne(id: Int, randomNumber: Int): Future[World] =
     for {
       coll <- mongoClient.worldCollectionFuture
-      _ <- coll.update(ordered = false)
+      _ <- coll
+        .update(ordered = false)
         .element(q = document("id" -> id), u = document("randomNumber" -> randomNumber), upsert = false, multi = false)
     } yield World(id, randomNumber)
 

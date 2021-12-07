@@ -8,7 +8,6 @@ import com.typesafe.scalalogging.Logger
 import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success}
 
-
 object Main {
   private val logger: Logger = Logger[Main.type]
 

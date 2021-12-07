@@ -87,7 +87,8 @@ class Routes(mongoClient: MongoClient)(implicit val system: ActorSystem[_]) {
       res <- coll.findAndUpdate(
         document("id" -> id),
         document("$set" -> document("randomNumber" -> randomNumber)),
-        fetchNewObject = true)
+        fetchNewObject = true
+      )
     } yield res.result[World]
 
   private def getQueriesValue(queries: Option[String]): Int =

@@ -5,6 +5,10 @@ import io.circe.generic.auto._
 import sttp.tapir._
 import sttp.tapir.generic.auto._
 import sttp.tapir.json.circe.jsonBody
+import sttp.tapir.model.UsernamePassword
+import sttp.tapir.server.PartialServerEndpoint
+
+import scala.concurrent.Future
 
 object Endpoint {
   private val worldBody: EndpointIO.Body[String, World] =
